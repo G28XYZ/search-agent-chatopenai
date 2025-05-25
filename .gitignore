@@ -1,0 +1,11 @@
+.venv
+resources
+ai-assist-test.py
+ai-from-tutorial.py
+src/main.py
+deepseek_main.py
+Modelfile
+openaichat.py
+pdf_translate.py
+/**/__pycache__/**
+.DS_Store
