@@ -3,7 +3,7 @@ from langchain_core.messages.utils import (
     count_tokens_approximately,
 )
 
-from langchain_core.messages import RemoveMessage
+from langchain_core.messages import RemoveMessage, HumanMessage, AIMessage
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 
 # def pre_model_hook(req) -> dict:
@@ -52,12 +52,28 @@ def pre_model_hook(state):
       token_counter = count_tokens_approximately,
       max_tokens    = 1000,
       start_on      = "human",
-      end_on        = ("human", "tool"),
+      end_on        = ("human", 'tool'),
   )
   trimmed_messages = normalize_messages(trimmed_messages)
-  print('\n'.join([f'{i}) {msg.content}' for i, msg in enumerate(trimmed_messages)]))
-  # return { "llm_input_messages": [trimmed_messages[-1]] }
-  return {"messages": [RemoveMessage(REMOVE_ALL_MESSAGES)] + trimmed_messages}
+  # print(trimmed_messages)
+  messages = []
+  
+  for idx, msg in enumerate(trimmed_messages):
+    try:
+      aiIdx = idx + 1
+      if isinstance(msg, HumanMessage) and aiIdx < len(trimmed_messages):
+        aiMessage = trimmed_messages[aiIdx];
+        if isinstance(aiMessage, AIMessage) and len(aiMessage.tool_calls) > 0:
+          # messages.append(RemoveMessage(id=trimmed_messages[idx].id))
+          continue
+    except:
+      pass
+    messages.append(msg)
+  
+  print(messages)
+  # print('\n'.join([f'{i}) {msg.content}' for i, msg in enumerate(trimmed_messages)]))
+  return { "llm_input_messages": messages }
+  # return {"messages": [RemoveMessage(REMOVE_ALL_MESSAGES)] + trimmed_messages}
 
 
 def print_stream(stream, output_messages_key="llm_input_messages"):
