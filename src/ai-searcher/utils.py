@@ -55,7 +55,6 @@ def pre_model_hook(state):
       end_on        = ("human", 'tool'),
   )
   trimmed_messages = normalize_messages(trimmed_messages)
-  # print(trimmed_messages)
   messages = []
   
   for idx, msg in enumerate(trimmed_messages):
@@ -70,10 +69,8 @@ def pre_model_hook(state):
       pass
     messages.append(msg)
   
-  print(messages)
   # print('\n'.join([f'{i}) {msg.content}' for i, msg in enumerate(trimmed_messages)]))
-  return { "llm_input_messages": messages }
-  # return {"messages": [RemoveMessage(REMOVE_ALL_MESSAGES)] + trimmed_messages}
+  return { "llm_input_messages": trimmed_messages[-2:] }
 
 
 def print_stream(stream, output_messages_key="llm_input_messages"):
